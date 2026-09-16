@@ -1,0 +1,33 @@
+{
+  "name": "warble-bot",
+  "version": "1.0.0",
+  "description": "Bot Discord de l'infrastructure Warble.fr",
+  "homepage": "https://github.com/xTOUKAM/warble-bot#readme",
+  "bugs": {
+    "url": "https://github.com/xTOUKAM/warble-bot/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xTOUKAM/warble-bot.git"
+  },
+  "license": "ISC",
+  "author": "TOUKAM",
+  "type": "module",
+  "main": "dist/apps/bot/src/index.js",
+  "scripts": {
+    "dev": "tsx watch apps/bot/src/index.ts",
+    "build": "tsc",
+    "start": "node dist/apps/bot/src/index.js",
+    "typecheck": "tsc --noEmit",
+    "test": "echo \"No tests configured yet\""
+  },
+  "dependencies": {
+    "discord.js": "^14.27.0",
+    "dotenv": "^17.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^26.5.1",
+    "tsx": "^4.23.13",
+    "typescript": "^7.0.2"
+  }
+}
