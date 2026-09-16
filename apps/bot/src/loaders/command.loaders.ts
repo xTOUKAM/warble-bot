@@ -6,10 +6,17 @@ import type { Client } from 'discord.js';
 
 import type { Command } from '../types/command.js';
 
-export async function loadCommands(client: Client & { commands?: Map<string, Command>; }, ): Promise<void> {
+import { validateCommand } from "../guards/command.guard.js";
+
+export async function loadCommands(
+    client: Client & { commands?: Map<string, Command> },
+    commandsPath: string = path.resolve(process.cwd(), "apps/bot/src/commands"),
+): Promise<void> {
     client.commands = new Map();
 
-    const commandsPath = path.resolve(process.cwd(), "apps/bot/src/commands");
+    if (!fs.existsSync(commandsPath)) {
+        throw new Error(`[WARBLE] Le dossier des commandes est introuvable : ${commandsPath}`);
+    }
 
     const categories = fs.readdirSync(commandsPath, { withFileTypes: true })
             .filter((entry) => entry.isDirectory());
@@ -26,10 +33,31 @@ export async function loadCommands(client: Client & { commands?: Map<string, Com
 
         for (const file of files) {
             const filePath = path.join(categoryPath, file);
-            const moduleUrl = pathToFileURL(filePath).href;
-            const imported = await import(moduleUrl);
+            let command: Command;
 
-            const command = imported.default as Command;
+            try {
+                const moduleUrl = pathToFileURL(filePath).href;
+
+                const imported = await import(
+                    `${moduleUrl}?update=${Date.now()}`
+                );
+
+                command = imported.default as Command;
+            } catch (error) {
+                console.error(
+                    `[WARBLE] Impossible de charger ${file} :`,
+                    error,
+                );
+
+                continue;
+            }
+
+            try {
+                validateCommand(command, file);
+            } catch (error) {
+                console.error(error);
+                continue;
+            }
 
             if (!command?.name) {
                 console.warn(`[WARBLE] ${file} ignoré : aucun nom défini.`);

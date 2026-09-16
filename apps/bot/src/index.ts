@@ -1,4 +1,5 @@
 import {
+    Events,
     GatewayIntentBits,
 } from "discord.js";
 
@@ -7,6 +8,8 @@ import "dotenv/config";
 const env = {
     discordToken: process.env.DISCORD_TOKEN ?? "",
 };
+
+import { logError } from "./errors/error-handler.js";
 
 import { WarbleClient } from "./types/client.js";
 
@@ -36,28 +39,21 @@ client.once("clientReady", async () => {
             await loadCommands(client);
             await deploySlashCommands(client, env.discordToken);
         } catch (error) {
-            console.error("[WARBLE] Erreur pendant l'initialisation :", error);
+            logError("Erreur pendant l'initialisation", error);
             process.exit(1);
         }
     },
 );
 
-client.on("error", (error) => { console.error("[WARBLE] Erreur Discord :", error) });
+client.on(Events.Error, (error) => { logError("Erreur Discord", error) });
+client.on(Events.ShardError, (error) => { logError("Erreur WebSocket Discord", error) });
 
-process.on("unhandledRejection", (error) => {
-        console.error("[WARBLE] Promise rejetée :", error);
-    },
-);
-
-process.on("uncaughtException", (error) => {
-        console.error("[WARBLE] Exception non gérée :", error);
-        process.exit(1);
-    },
-);
+process.on("unhandledRejection", (error) => { logError("Promise rejetée", error)});
+process.on("uncaughtException",(error) => { logError("Exception non gérée", error)});
 
 try {
     await client.login(env.discordToken);
 } catch (error) {
-    console.error("[WARBLE] Échec de connexion à Discord :", error);
-    process.exit(1);
+    logError("Impossible de se connecter à Discord", error);
+    process.exitCode = 1;
 }

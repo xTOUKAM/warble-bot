@@ -19,7 +19,9 @@
     "build": "tsc",
     "start": "node dist/apps/bot/src/index.js",
     "typecheck": "tsc --noEmit",
-    "test": "echo \"No tests configured yet\""
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "discord.js": "^14.27.0",
@@ -28,6 +30,7 @@
   "devDependencies": {
     "@types/node": "^26.5.1",
     "tsx": "^4.23.13",
-    "typescript": "^7.0.2"
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.1"
   }
 }
